@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Bus, MapPin, Zap, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import heroBg from "@/assets/hero-bg.jpg";
 
 export default function HeroSection() {
   return (
