@@ -6,7 +6,8 @@ import heroBg from "@/assets/hero-bg.jpg";
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen gradient-hero overflow-hidden flex items-center">
+    <section className="relative min-h-screen overflow-hidden flex items-center" style={{ backgroundImage: `url(${heroBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+      <div className="absolute inset-0 gradient-hero opacity-80" />
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         {[...Array(6)].map((_, i) => (
