@@ -217,7 +217,7 @@ export default function AdminDashboard() {
                       <tr key={fromStop.id} className="border-t border-border/50">
                         <td className="p-2 font-medium">{fromStop.name.slice(0, 8)}</td>
                         {stops.slice(0, 8).map((toStop, j) => {
-                          const val = useAppState().matrix?.dist[i]?.[j];
+                          const val = matrix?.dist[i]?.[j];
                           return (
                             <td key={toStop.id} className={`p-2 text-center ${i === j ? 'bg-muted/30' : ''}`}>
                               {val === Infinity ? "∞" : val?.toFixed(1) || "-"}
