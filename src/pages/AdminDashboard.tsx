@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 export default function AdminDashboard() {
-  const { stops, routes, addStop, removeStop, addRoute, removeRoute, recomputeMatrix } = useAppState();
+  const { stops, routes, matrix, addStop, removeStop, addRoute, removeRoute, recomputeMatrix } = useAppState();
 
   const [stopName, setStopName] = useState("");
   const [stopLat, setStopLat] = useState("");
