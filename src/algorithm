@@ -1,0 +1,154 @@
+from typing import List, Dict, Optional, TypedDict
+
+
+# ─── Data Types ────────────────────────────────────────────────
+class Stop(TypedDict):
+    id: str
+    name: str
+
+
+class Route(TypedDict):
+    id: str
+    fromStop: str
+    toStop: str
+    distance: float
+    time: float
+
+
+class AlgorithmResult(TypedDict):
+    path: List[str]
+    distance: float
+    time: float
+    stops: int
+
+
+Graph = Dict[str, List[Dict[str, float | str]]]
+
+
+# ─── Build Graph (same as TS) ─────────────────────────────────
+def build_graph(stops: List[Stop], routes: List[Route]) -> Graph:
+    g: Graph = {}
+
+    for s in stops:
+        g[s["id"]] = []
+
+    for r in routes:
+        if r["fromStop"] in g:
+            g[r["fromStop"]].append({
+                "to": r["toStop"],
+                "distance": r["distance"],
+                "time": r["time"]
+            })
+        if r["toStop"] in g:
+            g[r["toStop"]].append({
+                "to": r["fromStop"],
+                "distance": r["distance"],
+                "time": r["time"]
+            })
+
+    return g
+
+
+# ─── DIJKSTRA (min time) ──────────────────────────────────────
+def dijkstra(
+    stops: List[Stop],
+    routes: List[Route],
+    start_id: str,
+    end_id: str
+) -> Optional[AlgorithmResult]:
+
+    g = build_graph(stops, routes)
+    if start_id not in g or end_id not in g:
+        return None
+
+    time = {s["id"]: float("inf") for s in stops}
+    dist = {s["id"]: float("inf") for s in stops}
+    prev = {s["id"]: None for s in stops}
+
+    time[start_id] = 0
+    dist[start_id] = 0
+
+    visited = set()
+    queue = set(s["id"] for s in stops)
+
+    while queue:
+        u = min(queue, key=lambda x: time[x])
+        if time[u] == float("inf"):
+            break
+
+        queue.remove(u)
+        visited.add(u)
+
+        if u == end_id:
+            break
+
+        for edge in g[u]:
+            if edge["to"] in visited:
+                continue
+
+            alt = time[u] + edge["time"]
+            if alt < time[edge["to"]]:
+                time[edge["to"]] = alt
+                dist[edge["to"]] = dist[u] + edge["distance"]
+                prev[edge["to"]] = u
+
+    if time[end_id] == float("inf"):
+        return None
+
+    # Reconstruct path
+    path = []
+    cur = end_id
+    while cur:
+        path.insert(0, cur)
+        cur = prev[cur]
+
+    return {
+        "path": path,
+        "distance": dist[end_id],
+        "time": time[end_id],
+        "stops": len(path)
+    }
+
+
+# ─── BFS (fewest stops) ───────────────────────────────────────
+def bfs(
+    stops: List[Stop],
+    routes: List[Route],
+    start_id: str,
+    end_id: str
+) -> Optional[AlgorithmResult]:
+
+    g = build_graph(stops, routes)
+    if start_id not in g or end_id not in g:
+        return None
+
+    visited = {start_id}
+    queue = [[start_id]]
+
+    while queue:
+        path = queue.pop(0)
+        u = path[-1]
+
+        if u == end_id:
+            distance = 0
+            time = 0
+
+            for i in range(len(path) - 1):
+                for edge in g[path[i]]:
+                    if edge["to"] == path[i + 1]:
+                        distance += edge["distance"]
+                        time += edge["time"]
+
+            return {
+                "path": path,
+                "distance": distance,
+                "time": time,
+                "stops": len(path)
+            }
+
+        for edge in g[u]:
+            if edge["to"] not in visited:
+                visited.add(edge["to"])
+                queue.append(path + [edge["to"]])
+
+    return None
